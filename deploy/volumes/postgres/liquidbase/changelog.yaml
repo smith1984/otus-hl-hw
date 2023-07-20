@@ -1,0 +1,41 @@
+databaseChangeLog:
+
+  -  changeSet:
+       id:  1
+       author:  mppetrov
+       changes:
+         - sql:
+             "CREATE SCHEMA IF NOT EXISTS public;"
+         -  createTable:
+              schemaName: public
+              tableName: users
+              columns:
+                -  column:
+                     name:  id
+                     type:  char(36)
+                     constraints:
+                       primaryKey:  true
+                       nullable:  false
+                -  column:
+                     name:  first_name
+                     type:  varchar(36)
+                     constraints:
+                       nullable:  false
+                - column:
+                    name: second_name
+                    type: varchar(36)
+                - column:
+                    name: age
+                    type: integer
+                - column:
+                    name: birthdate
+                    type: date
+                - column:
+                    name: biography
+                    type: varchar(4000)
+                - column:
+                    name: city
+                    type: varchar(36)
+                - column:
+                    name: password
+                    type: varchar(36)

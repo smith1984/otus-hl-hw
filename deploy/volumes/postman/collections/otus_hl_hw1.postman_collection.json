@@ -1,0 +1,356 @@
+{
+	"info": {
+		"_postman_id": "830b66a5-72e0-4511-b744-1b5f98ece631",
+		"name": "otus_hl_hw1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25545992"
+	},
+	"item": [
+		{
+			"name": "Create user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Create user\", function () {",
+							"    pm.response.to.have.status(200)",
+							"});",
+							"",
+							"pm.test(\"Created user\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.user_id).not.eql(undefined);",
+							"    pm.expect(responseJson.user_id).not.eql(null);",
+							"});",
+							"",
+							"pm.collectionVariables.set(\"userId\", pm.response.json().user_id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"first_name\":\"Максим\",\"second_name\":\"Петров\",\"age\":39,\"birthdate\":\"1984-03-15\",\"biography\":\"Хобби, интересы и т.п.\",\"city\":\"Москва\",password:\"DRFTQWERT!#@$#$\"}"
+				},
+				"url": {
+					"raw": "http://{{hostApp}}:{{portApp}}/user/register",
+					"protocol": "http",
+					"host": [
+						"{{hostApp}}"
+					],
+					"port": "{{portApp}}",
+					"path": [
+						"user",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Create token\", function () {",
+							"    pm.response.to.have.status(200)",
+							"});",
+							"",
+							"pm.test(\"Created token\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.token).not.eql(undefined);",
+							"    pm.expect(responseJson.token).not.eql(null);",
+							"});",
+							"",
+							"pm.collectionVariables.set(\"token\", pm.response.json().token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":\"{{userId}}\",\"password\":\"DRFTQWERT!#@$#$\"}"
+				},
+				"url": {
+					"raw": "http://{{hostApp}}:{{portApp}}/login",
+					"protocol": "http",
+					"host": [
+						"{{hostApp}}"
+					],
+					"port": "{{portApp}}",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create token - incorrect password",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Create token with incorrect password\", function () {",
+							"    pm.response.to.have.status(400)",
+							"});",
+							"",
+							"pm.test(\"Failed create token\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.token).eql(undefined);",
+							"    pm.expect(responseJson.msg).not.eql(undefined);",
+							"    pm.expect(responseJson.msg).eql(\"Incorrect password\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":\"{{userId}}\",\"password\":\"DQWERT!#@$#$\"}"
+				},
+				"url": {
+					"raw": "http://{{hostApp}}:{{portApp}}/login",
+					"protocol": "http",
+					"host": [
+						"{{hostApp}}"
+					],
+					"port": "{{portApp}}",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create token - unregistered user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Create token for unregistered user\", function () {",
+							"    pm.response.to.have.status(404)",
+							"});",
+							"",
+							"pm.test(\"Failed create token\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.token).eql(undefined);",
+							"    pm.expect(responseJson.msg).not.eql(undefined);",
+							"    pm.expect(responseJson.msg).eql(\"User not found\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":\"38251380-b4fa-4782-bc27-66605dbb4ebe\",\"password\":\"DRFRT!#@$#$\"}"
+				},
+				"url": {
+					"raw": "http://{{hostApp}}:{{portApp}}/login",
+					"protocol": "http",
+					"host": [
+						"{{hostApp}}"
+					],
+					"port": "{{portApp}}",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user - unauthorized",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get user without authorization\", function () {",
+							"    pm.response.to.have.status(401)",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{hostApp}}:{{portApp}}/user/{{userId}}",
+					"protocol": "http",
+					"host": [
+						"{{hostApp}}"
+					],
+					"port": "{{portApp}}",
+					"path": [
+						"user",
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user - succes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get user\", function () {",
+							"    pm.response.to.have.status(200)",
+							"});",
+							"",
+							"pm.test(\"Verif user\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.id).eql(pm.variables.get(\"userId\"));",
+							"    pm.expect(responseJson.first_name).eql(\"Максим\");",
+							"    pm.expect(responseJson.second_name).eql(\"Петров\");",
+							"    pm.expect(responseJson.age).eql(39);",
+							"    pm.expect(responseJson.birthdate).eql(\"1984-03-15\");",
+							"    pm.expect(responseJson.biography).eql(\"Хобби, интересы и т.п.\");",
+							"    pm.expect(responseJson.city).eql(\"Москва\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{hostApp}}:{{portApp}}/user/{{userId}}",
+					"protocol": "http",
+					"host": [
+						"{{hostApp}}"
+					],
+					"port": "{{portApp}}",
+					"path": [
+						"user",
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+					"tests[\"[INFO] Response: \" + responseBody] = true;"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "hostApp",
+			"value": "localhost",
+			"type": "string"
+		},
+		{
+			"key": "portApp",
+			"value": "8080",
+			"type": "string"
+		}
+	]
+}

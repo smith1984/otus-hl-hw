@@ -1,0 +1,68 @@
+version: '3'
+services:
+  sleep:
+    image: alpine
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo "sleep for 15 sec"
+        sleep 15
+    depends_on:
+      - app
+
+  postman:
+    image: dannydainton/htmlextra
+    container_name: postman
+    volumes:
+      - "./volumes/postman/:/etc/newman"
+    depends_on:
+      sleep:
+        condition: service_completed_successfully
+    command:
+      run /etc/newman/collections/otus_hl_hw1.postman_collection.json
+      --environment /etc/newman/env.json
+      --reporters cli,htmlextra
+
+  app:
+    image: smith1984/hl-hw-app:0.0.1
+    container_name: app
+    hostname: app
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      liquibase:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    volumes:
+      - "./volumes/app/application.yaml:/app/resources/application.yaml"
+
+  postgres:
+    image: postgres:15.2
+    container_name: postgres
+    hostname: postgres
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 15s
+      interval: 5s
+      retries: 10
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./volumes/postgres/sql:/docker-entrypoint-initdb.d"
+      - "./volumes/postgres/data:/data/postgres"
+
+  liquibase:
+    container_name: liquibase
+    image: liquibase/liquibase:4.21.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: liquibase --url=jdbc:postgresql://postgres:5432/highload?user=user --changelog-file=changelog.yaml update
+    volumes:
+      - "./volumes/postgres/liquidbase/changelog.yaml:/liquibase/changelog.yaml"

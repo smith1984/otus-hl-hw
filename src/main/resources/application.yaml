@@ -1,0 +1,17 @@
+ktor:
+  application:
+    modules:
+      - ru.beeline.ApplicationKt.module
+  deployment:
+    port: 8080
+psql:
+  user: "$POSTGRES_USER:user"
+  password: "$POSTGRES_PASSWORD:password"
+  schema: "$POSTGRES_SCHEMA:public"
+  url: "$POSTGRES_URL:jdbc:postgresql://localhost:5432/highload"
+
+jwt:
+  secret: "secret"
+  issuer: "http://localhost:8080/"
+  audience: "http://localhost:8080/user"
+  realm: "Access to 'user'"
