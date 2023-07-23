@@ -5,11 +5,10 @@ import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
-import io.ktor.server.config.*
 import ru.beeline.config.JwtConfig
 
-fun Application.configureAuth(cfg: ApplicationConfig) {
-    val jwtCfg = JwtConfig(cfg)
+fun Application.configureAuth() {
+    val jwtCfg = JwtConfig(environment.config)
 
     install(Authentication) {
         jwt("auth-jwt") {

@@ -1,35 +1,41 @@
 version: '3'
 services:
-  sleep:
-    image: alpine
-    command:
-      - /bin/sh
-      - -c
-      - |
-        echo "sleep for 15 sec"
-        sleep 15
-    depends_on:
-      - app
-
-  postman:
-    image: dannydainton/htmlextra
-    container_name: postman
-    volumes:
-      - "./volumes/postman/:/etc/newman"
-    depends_on:
-      sleep:
-        condition: service_completed_successfully
-    command:
-      run /etc/newman/collections/otus_hl_hw1.postman_collection.json
-      --environment /etc/newman/env.json
-      --reporters cli,htmlextra
-
+#  sleep:
+#    image: alpine
+#    command:
+#      - /bin/sh
+#      - -c
+#      - |
+#        echo "sleep for 15 sec"
+#        sleep 15
+#    depends_on:
+#      - app
+#
+#  postman:
+#    image: dannydainton/htmlextra
+#    container_name: postman
+#    volumes:
+#      - "./volumes/postman/:/etc/newman"
+#    depends_on:
+#      sleep:
+#        condition: service_completed_successfully
+#    command:
+#      run /etc/newman/collections/otus_hl_hw1.postman_collection.json
+#      --environment /etc/newman/env.json
+#      --reporters cli,htmlextra
+#
   app:
-    image: smith1984/hl-hw-app:0.0.1
+    image: smith1984/hl-hw-app:0.0.2
     container_name: app
     hostname: app
+    deploy:
+      resources:
+        limits:
+          cpus: '6.0'
+        reservations:
+          cpus: '6.0'
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on:
       postgres:
         condition: service_healthy
@@ -66,3 +72,31 @@ services:
     command: liquibase --url=jdbc:postgresql://postgres:5432/highload?user=user --changelog-file=changelog.yaml update
     volumes:
       - "./volumes/postgres/liquidbase/changelog.yaml:/liquibase/changelog.yaml"
+
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    depends_on:
+      - app
+    volumes:
+      - ./volumes/prometheus:/etc/prometheus/
+    container_name: prometheus
+    hostname: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.0.2
+    user: root
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - ./volumes/grafana:/var/lib/grafana
+      - ./volumes/grafana/provisioning/:/etc/grafana/provisioning/
+    container_name: grafana
+    hostname: grafana
+    restart: unless-stopped

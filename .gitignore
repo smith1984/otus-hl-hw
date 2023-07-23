@@ -10,3 +10,4 @@
 
 /deploy/volumes/**/data
 /docs/
+!/docs/homeworks/

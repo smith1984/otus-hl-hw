@@ -1,8 +1,10 @@
 package ru.beeline.dao
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import ru.beeline.models.Auth
 import ru.beeline.models.User
 import ru.beeline.models.Users
@@ -52,3 +54,6 @@ class DAOFacadeImpl : DAOFacade {
 }
 
 val dao: DAOFacade = DAOFacadeImpl()
+
+suspend fun <T> dbQuery(block: suspend () -> T): T =
+    newSuspendedTransaction(Dispatchers.IO) { block() }
