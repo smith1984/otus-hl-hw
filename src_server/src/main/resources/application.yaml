@@ -8,14 +8,14 @@ psql:
   user: "$POSTGRES_USER:user"
   password: "$POSTGRES_PASSWORD:password"
   schema: "$POSTGRES_SCHEMA:public"
-  url: "$POSTGRES_URL:jdbc:postgresql://postgres:5432/highload"
+  url: "$POSTGRES_URL:jdbc:postgresql://localhost:5432/highload"
   hikariProperties:
     - cachePrepStmts_true
-    - prepStmtCacheSize_250
-    - prepStmtCacheSqlLimit_2048
+    - prepStmtCacheSize_1000
+    - prepStmtCacheSqlLimit_8192
 
 jwt:
   secret: "secret"
-  issuer: "http://app:8080/"
-  audience: "http://app:8080/user"
+  issuer: "http://localhost:8080/"
+  audience: "http://localhost:8080/user"
   realm: "Access to 'user'"

@@ -10,3 +10,6 @@ pluginManagement {
         id("org.jetbrains.kotlin.plugin.serialization") version kotlin_version apply false
     }
 }
+
+include("src_server")
+include("src_client")

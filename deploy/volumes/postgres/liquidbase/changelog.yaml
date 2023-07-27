@@ -18,12 +18,12 @@ databaseChangeLog:
                        nullable:  false
                 -  column:
                      name:  first_name
-                     type:  varchar(36)
+                     type:  text
                      constraints:
                        nullable:  false
                 - column:
                     name: second_name
-                    type: varchar(36)
+                    type: text
                 - column:
                     name: age
                     type: integer
@@ -39,3 +39,11 @@ databaseChangeLog:
                 - column:
                     name: password
                     type: varchar(36)
+  - changeSet:
+      id: 2
+      author: mppetrov
+      changes:
+        - sql:
+            "create extension btree_gist;"
+        - sql:
+            "create index if not exists names_ind on users using gist (first_name, second_name, id) include (age, birthdate, biography, city);"
