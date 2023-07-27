@@ -15,7 +15,7 @@ fun Application.configureMetrics(prometheusMeterRegistry: PrometheusMeterRegistr
         registry = prometheusMeterRegistry
         distributionStatisticConfig = DistributionStatisticConfig.Builder()
             .percentilesHistogram(true)
-            .maximumExpectedValue(Duration.ofSeconds(20).toNanos().toDouble())
+            .maximumExpectedValue(Duration.ofSeconds(5).toNanos().toDouble())
             .serviceLevelObjectives(
                 Duration.ofMillis(10).toNanos().toDouble(),
                 Duration.ofMillis(50).toNanos().toDouble(),

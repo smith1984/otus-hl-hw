@@ -9,8 +9,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.routing.get
 import io.ktor.server.util.*
 import ru.beeline.dao.dao
-import ru.beeline.models.UserDTO
-import ru.beeline.models.userDTOToUser
+import ru.beeline.models.*
 import java.util.*
 
 fun Route.userRouting() {
@@ -26,6 +25,20 @@ fun Route.userRouting() {
                     status = HttpStatusCode.ExpectationFailed,
                     hashMapOf("msg" to "Expectation Failed. User not added to DB")
                 )
+            call.respond(response)
+        }
+
+        post("search") {
+            val searchProfileDTO = call.receive<SearchProfileDTO>()
+            val response = if (searchProfileDTO.first_name == null || searchProfileDTO.second_name == null) {
+                return@post call.respond(
+                    status = HttpStatusCode.fromValue(400),
+                    hashMapOf("msg" to "Invalid data from request")
+                )
+            }
+            else {
+                dao.search(SearchProfile("${searchProfileDTO.first_name}", "${searchProfileDTO.second_name}"))
+            }
             call.respond(response)
         }
 

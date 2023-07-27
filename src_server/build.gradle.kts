@@ -35,6 +35,7 @@ dependencies {
     val logback_version: String by project
     val exposed_version: String by project
     val postgres_version: String by project
+    val hikaricp_version: String by project
     val prometheus_version: String by project
     val logback_appenders_version: String by project
     val kotlin_dt_version: String by project
@@ -60,6 +61,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
+    implementation("com.zaxxer:HikariCP:$hikaricp_version")
 
     implementation("io.ktor:ktor-server-call-logging:$ktor_version")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktor_version")

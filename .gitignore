@@ -11,3 +11,5 @@
 /deploy/volumes/**/data
 /docs/
 !/docs/homeworks/
+/deploy/volumes/grafana/
+/deploy/volumes/postman/newman/

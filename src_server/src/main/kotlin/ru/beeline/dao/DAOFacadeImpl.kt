@@ -5,9 +5,7 @@ import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
-import ru.beeline.models.Auth
-import ru.beeline.models.User
-import ru.beeline.models.Users
+import ru.beeline.models.*
 
 class DAOFacadeImpl : DAOFacade {
 
@@ -51,6 +49,22 @@ class DAOFacadeImpl : DAOFacade {
         } else
             null
     }
+
+    override suspend fun search(searchProfile: SearchProfile): List<User> = dbQuery {
+        Users.slice(
+            Users.first_name,
+            Users.second_name,
+            Users.id,
+            Users.age,
+            Users.birthdate,
+            Users.biography,
+            Users.city
+        )
+            .select { Users.first_name like "${searchProfile.firstName}%" and (Users.second_name like "${searchProfile.secondName}%") }
+            .orderBy(Users.id)
+            .map(::resultRowToUser)
+    }
+
 }
 
 val dao: DAOFacade = DAOFacadeImpl()

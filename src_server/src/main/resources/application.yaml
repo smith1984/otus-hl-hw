@@ -9,6 +9,10 @@ psql:
   password: "$POSTGRES_PASSWORD:password"
   schema: "$POSTGRES_SCHEMA:public"
   url: "$POSTGRES_URL:jdbc:postgresql://localhost:5432/highload"
+  hikariProperties:
+    - cachePrepStmts_true
+    - prepStmtCacheSize_1000
+    - prepStmtCacheSqlLimit_8192
 
 jwt:
   secret: "secret"

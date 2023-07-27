@@ -1,63 +1,41 @@
 package ru.beeline
 
-import io.ktor.client.*
-import io.ktor.client.engine.java.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
-import kotlin.system.measureTimeMillis
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.DurationUnit
+import ru.beeline.common.readFile
+import ru.beeline.generator.getConditionForSearch
+import ru.beeline.generator.getProfiles
+import ru.beeline.http.request.parallelRequest
+import ru.beeline.models.FakeData
+import ru.beeline.models.ProfileId
+import kotlin.time.Duration.Companion.seconds
 
 suspend fun main(args: Array<String>): Unit {
 
-    val numRequests = 300
-    val timeInterval = 2.minutes
+    val rootPath = "src_client/src/main/resources"
+    val fakeData = FakeData(rootPath)
 
-    val allRequest = numRequests * timeInterval.toInt(DurationUnit.SECONDS)
+// Создание 1 000 000 анкет
+//    val profiles = getProfiles(100000, fakeData)
+//    parallelRequest(
+//        numRequestPerSecond = 100,
+//        isAwaitDelay = false,
+//        cntRequestForClient = 100,
+//        host = "localhost",
+//        port = 8081,
+//        path = "user/register",
+//        lstProfile = profiles
+//    )
 
-    val countClient = 1 + numRequests / 100
+ //Нагрузочное тестирование поиска анкет
+    val dataForSearch = getConditionForSearch(fakeData, isFullName = false)
 
-    val clients = (1..countClient).map {
-        HttpClient(Java) {
-            install (ContentNegotiation) {
-                json()
-            }
-        }
-    }
-
-    suspend fun requestPerSecond(): Int {
-        var status: Int = 0
-        val time = measureTimeMillis {
-            status = clients[(clients.indices).random()].get("http://localhost:8080/health").status.value
-            if (status != 200) println("status: $status")
-        }
-        if (time < 1000) delay(1000 - time)
-        return status
-    }
-
-    delay(1000)
-
-    val requestSemaphore = Semaphore(numRequests)
-
-    coroutineScope {
-        val time = measureTimeMillis {
-            val count = (1..allRequest).map {
-                async {
-                    requestSemaphore.withPermit { requestPerSecond() }
-                }
-            }.awaitAll().filter { it == 200 }.count()
-            println("Get count with status 200: $count")
-        }
-        println("GET status code (n=$allRequest): $time ms")
-    }
-
-    clients.forEach { client -> client.close() }
+    parallelRequest(
+        numRequestPerSecond = 1000,
+        isAwaitDelay = true,
+        timeSendRequest = 500.seconds,
+        cntRequestForClient = 100,
+        host = "localhost",
+        port = 8081,
+        path = "user/search",
+        lstProfile = dataForSearch
+    )
 }
-

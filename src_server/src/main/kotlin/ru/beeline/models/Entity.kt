@@ -33,10 +33,22 @@ data class Auth(
     val password: String
 )
 
+@Serializable
+data class SearchProfileDTO(
+    val first_name: String?,
+    val second_name: String?
+)
+
+@Serializable
+data class SearchProfile(
+    val firstName: String,
+    val secondName: String
+)
+
 object Users : Table("users") {
     val id = char("id", 36).uniqueIndex()
-    val first_name = varchar("first_name", 36)
-    val second_name = varchar("second_name", 36)
+    val first_name = text("first_name")
+    val second_name = text("second_name")
     val age = integer("age")
     val birthdate = date("birthdate")
     val biography = varchar("biography", 4000)
@@ -48,3 +60,6 @@ object Users : Table("users") {
 
 fun userDTOToUser(userDTO: UserDTO, id: String) =
     User(id, userDTO.first_name, userDTO.second_name, userDTO.age, userDTO.birthdate, userDTO.biography, userDTO.city)
+
+@Serializable
+data class ProfileId(val id: String)
