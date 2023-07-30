@@ -14,6 +14,16 @@ psql:
     - prepStmtCacheSize_1000
     - prepStmtCacheSqlLimit_8192
 
+psql-slave:
+  user: "$POSTGRES_USER:user"
+  password: "$POSTGRES_PASSWORD:password"
+  schema: "$POSTGRES_SCHEMA:public"
+  url: "$POSTGRES_URL:jdbc:postgresql://localhost:5433/highload"
+  hikariProperties:
+    - cachePrepStmts_true
+    - prepStmtCacheSize_1000
+    - prepStmtCacheSqlLimit_8192
+
 jwt:
   secret: "secret"
   issuer: "http://localhost:8080/"

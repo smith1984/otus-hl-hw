@@ -25,7 +25,7 @@ services:
 #      --reporters cli,htmlextra
 
   app:
-    image: smith1984/hl-hw-app:0.0.2
+    image: smith1984/hl-hw-app:0.0.3
     container_name: app
     hostname: app
     entrypoint: ["java", "-XX:+UseContainerSupport", "-cp", "@/app/jib-classpath-file", "ru.beeline.ApplicationKt"]
@@ -41,6 +41,8 @@ services:
       - "8081:8080"
     depends_on:
       postgres:
+        condition: service_healthy
+      postgres-slave:
         condition: service_healthy
       liquibase:
         condition: service_completed_successfully
@@ -58,11 +60,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '8.0'
-          memory: '8G'
+          cpus: '4.0'
+          memory: '4G'
         reservations:
-          cpus: '8.0'
-          memory: '8G'
+          cpus: '4.0'
+          memory: '4G'
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       timeout: 15s
@@ -75,7 +77,56 @@ services:
     volumes:
       - "./volumes/postgres/sql:/docker-entrypoint-initdb.d"
       - "./volumes/postgres/data:/data/postgres"
-      - "./volumes/postgres/postgresql.conf:/var/lib/postgresql/data/postgresql.conf"
+    restart: unless-stopped
+
+  postgres-slave:
+    image: postgres:15.2
+    container_name: postgres-slave
+    hostname: postgres-slave
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: '4G'
+        reservations:
+          cpus: '4.0'
+          memory: '4G'
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 15s
+      interval: 5s
+      retries: 10
+    env_file:
+      - .env
+    ports:
+      - "5433:5432"
+    volumes:
+      - "./volumes/postgres/data_slave:/data/postgres"
+    restart: unless-stopped
+
+  postgres-slave-2:
+    image: postgres:15.2
+    container_name: postgres-slave-2
+    hostname: postgres-slave-2
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: '4G'
+        reservations:
+          cpus: '4.0'
+          memory: '4G'
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 15s
+      interval: 5s
+      retries: 10
+    env_file:
+      - .env
+    ports:
+      - "5434:5432"
+    volumes:
+      - "./volumes/postgres/data_slave2:/data/postgres"
     restart: unless-stopped
 
   liquibase:

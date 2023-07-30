@@ -8,37 +8,28 @@ import ru.beeline.config.PostgresConfig
 
 fun Application.configureDB() {
 
-    val pgConfig = PostgresConfig(environment.config)
+    val pgConfigMaster = PostgresConfig(environment.config, "psql")
 
-    fun createHikariDataSource(
-        url: String,
-        driver: String,
-        user: String,
-        pass: String,
-    ): HikariDataSource {
-        val cfg = HikariConfig().apply {
-            driverClassName = driver
-            jdbcUrl = url
-            username = user
-            password = pass
-            maximumPoolSize = 20
-            isAutoCommit = false
-            transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+    val dsMaster = createHikariDataSource(pgConfigMaster)
 
-            validate()
-        }
+    val database = Database.connect(dsMaster)
+}
 
-        pgConfig.hikariProperties.forEach { entry -> cfg.addDataSourceProperty(entry.key, entry.value) }
+fun createHikariDataSource(pgConfig: PostgresConfig
+): HikariDataSource {
+    val cfg = HikariConfig().apply {
+        driverClassName = pgConfig.driver
+        jdbcUrl = pgConfig.url
+        username = pgConfig.user
+        password = pgConfig.password
+        maximumPoolSize = 20
+        isAutoCommit = false
+        transactionIsolation = "TRANSACTION_REPEATABLE_READ"
 
-        return HikariDataSource(cfg)
+        validate()
     }
 
-    val ds = createHikariDataSource(
-        url = pgConfig.url,
-        driver = pgConfig.driver,
-        user = pgConfig.user,
-        pass = pgConfig.password
-    )
-    val database = Database.connect(ds)
+    pgConfig.hikariProperties.forEach { entry -> cfg.addDataSourceProperty(entry.key, entry.value) }
 
+    return HikariDataSource(cfg)
 }

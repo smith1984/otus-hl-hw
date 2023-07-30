@@ -14,7 +14,7 @@ suspend fun main(args: Array<String>): Unit {
     val fakeData = FakeData(rootPath)
 
 // Создание 1 000 000 анкет
-//    val profiles = getProfiles(100000, fakeData)
+//    val profiles = getProfiles(50000, fakeData)
 //    parallelRequest(
 //        numRequestPerSecond = 100,
 //        isAwaitDelay = false,
@@ -25,17 +25,32 @@ suspend fun main(args: Array<String>): Unit {
 //        lstProfile = profiles
 //    )
 
- //Нагрузочное тестирование поиска анкет
-    val dataForSearch = getConditionForSearch(fakeData, isFullName = false)
+// Нагрузочное тестирование поиска анкет
+//    val dataForSearch = getConditionForSearch(fakeData, isFullName = false)
+//
+//    parallelRequest(
+//        numRequestPerSecond = 100,
+//        isAwaitDelay = true,
+//        timeSendRequest = 360.seconds,
+//        cntRequestForClient = 100,
+//        host = "localhost",
+//        port = 8081,
+//        path = "user/search",
+//        lstProfile = dataForSearch
+//    )
 
-    parallelRequest(
-        numRequestPerSecond = 1000,
-        isAwaitDelay = true,
-        timeSendRequest = 500.seconds,
-        cntRequestForClient = 100,
-        host = "localhost",
-        port = 8081,
-        path = "user/search",
-        lstProfile = dataForSearch
-    )
+// Нагрузочное тестирование поиска пользователя по id
+//    val lstId = readFile("${rootPath}/user_id.txt").map { ProfileId(it) }
+//
+//    parallelRequest(
+//        numRequestPerSecond = 100,
+//        isAwaitDelay = true,
+//        timeSendRequest = 360.seconds,
+//        cntRequestForClient = 100,
+//        host = "localhost",
+//        port = 8081,
+//        path = "user",
+//        lstProfile = lstId,
+//        method = "get"
+//    )
 }

@@ -8,11 +8,11 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ru.beeline.config.JwtConfig
-import ru.beeline.dao.dao
+import ru.beeline.dao.DAOFacadeImpl
 import ru.beeline.models.Auth
 import java.util.*
 
-fun Route.loginRouting(cfg: JwtConfig) {
+fun Route.loginRouting(cfg: JwtConfig, dao: DAOFacadeImpl) {
 
     route("/login") {
         post {

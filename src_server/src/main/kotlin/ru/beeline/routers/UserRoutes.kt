@@ -8,11 +8,12 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.routing.get
 import io.ktor.server.util.*
-import ru.beeline.dao.dao
+import ru.beeline.dao.DAOFacadeImpl
 import ru.beeline.models.*
 import java.util.*
 
-fun Route.userRouting() {
+fun Route.userRouting(dao: DAOFacadeImpl) {
+
     route("user") {
         post("register") {
             val userDTO = call.receive<UserDTO>()
@@ -35,22 +36,19 @@ fun Route.userRouting() {
                     status = HttpStatusCode.fromValue(400),
                     hashMapOf("msg" to "Invalid data from request")
                 )
-            }
-            else {
+            } else {
                 dao.search(SearchProfile("${searchProfileDTO.first_name}", "${searchProfileDTO.second_name}"))
             }
             call.respond(response)
         }
 
-        authenticate("auth-jwt") {
-            get("{id}") {
-                val id = call.parameters.getOrFail<String>("id")
-                val user = dao.user(id) ?: return@get call.respond(
-                    status = HttpStatusCode.NotFound,
-                    hashMapOf("msg" to "Not found user with id $id")
-                )
-                call.respond(user)
-            }
+        get("{id}") {
+            val id = call.parameters.getOrFail<String>("id")
+            val user = dao.user(id) ?: return@get call.respond(
+                status = HttpStatusCode.NotFound,
+                hashMapOf("msg" to "Not found user with id $id")
+            )
+            call.respond(user)
         }
     }
 }

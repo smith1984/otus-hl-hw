@@ -17,7 +17,7 @@ fun main(args: Array<String>): Unit =
 fun Application.module() {
     val prometheusMeterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
-    configureDB()
+    //configureDB()
     configureSerialization()
     configureMetrics(prometheusMeterRegistry)
     configureAuth()
