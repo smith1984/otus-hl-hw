@@ -47,3 +47,11 @@ databaseChangeLog:
             "create extension btree_gist;"
         - sql:
             "create index if not exists names_ind on users using gist (first_name, second_name, id) include (age, birthdate, biography, city);"
+  - changeSet:
+      id: 3
+      author: mppetrov
+      changes:
+        - sql:
+            "create extension pg_trgm;"
+        - sql:
+            "create index if not exists namestrgm_ind on users using gist (first_name gist_trgm_ops, second_name gist_trgm_ops) include (id, age, birthdate, biography, city);"

@@ -14,6 +14,7 @@ import kotlinx.serialization.json.Json
 import ru.beeline.http.client.getClients
 import ru.beeline.models.IProfile
 import ru.beeline.models.IProfileSerializer
+import ru.beeline.models.ProfileId
 import kotlin.system.measureTimeMillis
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -94,12 +95,23 @@ suspend fun parallelRequest(
                         requestSemaphore.withPermit {
                             requestPerSecond(
                                 response = when (method) {
-                                    "get" -> getProfile(
-                                        client = clients[(clients.indices).random()],
-                                        host,
-                                        port,
-                                        path
-                                    )
+
+                                    "get" -> {
+                                        val iProfile =
+                                            if (timeSendRequest == 0.seconds) lstProfile[it] else lstProfile[lstProfile.indices.random()]
+
+                                        val appendPath: String = when (iProfile) {
+                                            is ProfileId -> "/${iProfile.id}"
+                                            else -> ""
+                                        }
+
+                                        getProfile(
+                                            client = clients[(clients.indices).random()],
+                                            host,
+                                            port,
+                                            path = path + appendPath
+                                        )
+                                    }
 
                                     "post" -> postProfile(
                                         client = clients[(clients.indices).random()],

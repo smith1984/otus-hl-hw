@@ -11,12 +11,12 @@ data class PostgresConfig(
     val driver: String = "org.postgresql.Driver",
     val hikariProperties: Map<String, String> = mapOf()
 ) {
-    constructor(config: ApplicationConfig): this(
-        url = config.property("psql.url").getString(),
-        user = config.property("psql.user").getString(),
-        password = config.property("psql.password").getString(),
-        schema = config.property("psql.schema").getString(),
-        hikariProperties = config.property("psql.hikariProperties").getList()
+    constructor(config: ApplicationConfig, node: String): this(
+        url = config.property("${node}.url").getString(),
+        user = config.property("${node}.user").getString(),
+        password = config.property("${node}.password").getString(),
+        schema = config.property("${node}.schema").getString(),
+        hikariProperties = config.property("${node}.hikariProperties").getList()
             .associate { prop -> prop.split("_")[0] to prop.split("_")[1] }
     )
 }

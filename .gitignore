@@ -13,3 +13,5 @@
 !/docs/homeworks/
 /deploy/volumes/grafana/
 /deploy/volumes/postman/newman/
+/deploy/volumes/postgres/data_slave2/
+/deploy/volumes/postgres/data_slave/
